@@ -90,6 +90,7 @@ counselors run -t claude,codex "Review src/api/ for security issues and missing 
 | Claude Code | `claude` | enforced | [docs](https://docs.anthropic.com/en/docs/claude-code) |
 | OpenAI Codex | `codex` | enforced | [github](https://github.com/openai/codex) |
 | Gemini CLI | `gemini` | enforced | [github](https://github.com/google-gemini/gemini-cli) |
+| Antigravity CLI | `antigravity` | enforced | [docs](https://antigravity.google/docs/cli/install) |
 | Amp CLI | `amp` | enforced | [ampcode.com](https://ampcode.com) |
 | Custom | user-defined | configurable | — |
 
