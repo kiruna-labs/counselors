@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - New Claude Fable 5 model presets (`claude-fable-high`, `claude-fable`), now the recommended default ahead of the existing Opus/Sonnet/Haiku presets
+- New GPT-5.6 Codex model presets (`codex-sol-high`/`-xhigh`/`-medium`, `codex-terra`, `codex-luna`), with Sol-high now the recommended default ahead of the existing gpt-5.3-codex presets
 
 ### Changed
 - Standalone release binaries are now built into `release/` instead of `dist/`, decoupling binary artifacts from npm package contents
