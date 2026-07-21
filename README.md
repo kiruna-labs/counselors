@@ -1,34 +1,28 @@
-# counselors
+# /counselors — make your Claude Fable, GPT-5.6 Sol, and Antigravity subscriptions work together
 
-By [Aaron Francis](https://aaronfrancis.com), creator of [Faster.dev](https://faster.dev) and [Solo](https://soloterm.com).
+`/counselors` is a skill for Claude Code and Codex. It lets you run reviews in Claude using GPT-5.6 Sol, or in Codex using Fable — or ask all your frontier models at once, and the skill draws conclusions from their responses automatically.
 
-Fan out prompts to multiple AI coding agents in parallel.
+Originally by [Aaron Francis](https://aaronfrancis.com), creator of [Faster.dev](https://faster.dev) and [Solo](https://soloterm.com) — this repository is a fork of [aarondfrancis/counselors](https://github.com/aarondfrancis/counselors) with a few additions ([details below](#whats-new-in-this-fork), and as PRs on the original repo).
 
-`counselors` dispatches the same prompt to Claude, Codex, Gemini, Antigravity, Amp, or custom tools simultaneously, collects their responses, and writes everything to a structured output directory.
+## How it works
 
-No MCP servers, no direct API integrations, no complex configuration. It just calls your locally installed CLI tools.
+1. You already have a Claude, Codex, and/or Antigravity (aka Gemini) subscription that includes CLI access, with the CLI installed and authenticated.
+2. [Install the `/counselors` skill](#agentic-quickstart).
+3. Type `/counselors review the implementation plan for correctness and highlight strengths and weaknesses`.
+   - The skill prompts you for which frontier model(s) you want to fan out to.
+   - It hands those models the context and prompt *through your already-installed CLIs*, without accruing any extra expense, and synthesizes what they agree and disagree on.
 
-## Will this get me banned from my provider?
-
-Counselors only uses providers' **first-party CLI tools**. It does not call provider APIs directly, it does not extract or reuse auth tokens, and it does not do anything "tricky" behind the scenes. It literally runs the official CLI binaries you already installed, the same way you would from your terminal.
-
-You are still subject to each provider's terms and rate limits. Counselors is just an orchestrator around the CLIs.
+Counselors only uses the first-party CLI tools you installed. It does not call provider APIs directly, it does not extract or reuse auth tokens, and it does not do anything "tricky" behind the scenes. It literally runs the official CLI binaries you already installed, the same way you would from your terminal. You are still subject to each provider's terms and rate limits — counselors is just an orchestrator around the CLIs.
 
 ## Agentic quickstart
 
-Install the CLI yourself first (pick one):
+Install the skill by pasting this into Claude Code or Codex (Node 20+ required) — one command installs, discovers and configures your installed AI CLIs, and prints the skill template:
 
-- npm (requires Node 20+): `npm install -g counselors`
-- Homebrew: `brew install aarondfrancis/homebrew-tap/counselors`
-- Standalone binary: `curl -fsSL https://github.com/aarondfrancis/counselors/raw/main/install.sh | bash`
-
-Then paste this to your AI coding agent:
-
-```
-Run `counselors init --auto` to discover and configure installed AI CLIs. Then run `counselors skill` to see how to create a skill for the counselors CLI.
+```bash
+git clone https://github.com/kiruna-labs/counselors.git && cd counselors && npm install && npm run build && npm link && counselors init --auto && counselors skill
 ```
 
-Your agent will configure available tools and set up the `/counselors` slash command.
+Your agent runs it, then uses the printed skill template to set up the `/counselors` slash command.
 
 ### Updating your skill
 
@@ -43,10 +37,10 @@ The counselors CLI has an updated skill template.
 2. Open my existing counselors skill file and compare VERY CAREFULLY for anything that changed.
 3. Apply the updates manually; do not blindly overwrite.
 4. If you need more context, check the git history for the skill template here:
-   https://github.com/aarondfrancis/counselors/commits/main/src/commands/skill.ts
+   https://github.com/kiruna-labs/counselors/commits/main/src/commands/skill.ts
 ```
 
-**How it works:**
+**What happens when you run it:**
 
 1. You invoke the Counselors skill with a prompt
 2. Your agent gathers context from the codebase
@@ -66,11 +60,11 @@ Your main agent handles the rest — it gathers relevant code, recent commits, a
 
 ## Human quickstart
 
-Install the CLI (pick one):
+Install the CLI — one command (Node 20+ required):
 
-- npm (requires Node 20+): `npm install -g counselors`
-- Homebrew: `brew install aarondfrancis/homebrew-tap/counselors`
-- Standalone binary: `curl -fsSL https://github.com/aarondfrancis/counselors/raw/main/install.sh | bash`
+```bash
+git clone https://github.com/kiruna-labs/counselors.git && cd counselors && npm install && npm run build && npm link
+```
 
 ```bash
 # Discover installed AI CLIs and create a config
@@ -82,6 +76,14 @@ counselors run "Trace the state management flow in the dashboard and flag any br
 # Send to specific tools only
 counselors run -t claude,codex "Review src/api/ for security issues and missing edge cases"
 ```
+
+## What's new in this fork
+
+Three things ahead of upstream as of this writing, each empirically verified against the real CLIs and covered by tests — every one of them is additive (nothing existing was removed or replaced), and each has an open PR upstream if you'd rather track the original repo directly:
+
+- **Claude Fable 5 presets** (`claude-fable-high`, `claude-fable`) — Anthropic's newest, most capable model, now the recommended default. Opus/Sonnet/Haiku are still there, unchanged. ([upstream PR #45](https://github.com/aarondfrancis/counselors/pull/45))
+- **GPT-5.6 Sol/Terra/Luna presets** (`codex-sol-*`, `codex-terra`, `codex-luna`) — OpenAI's newest Codex generation, now the recommended default. The existing `gpt-5.3-codex` presets are still there, unchanged. ([upstream PR #46](https://github.com/aarondfrancis/counselors/pull/46))
+- **A new Antigravity CLI adapter** (`antigravity`) — Google shut down the standalone Gemini CLI for individual users on 2026-06-18; Antigravity (`agy`) is the actual replacement, with its own model roster and permission model. See [Supported tools](#supported-tools) and [Known issues](#known-issues) below for specifics. ([upstream PR #44](https://github.com/aarondfrancis/counselors/pull/44), closes upstream issue #24)
 
 ## Supported tools
 
@@ -105,7 +107,7 @@ counselors run "Your prompt here"
 counselors run -f prompt.md              # Use a prompt file
 echo "prompt" | counselors run           # Read from stdin
 counselors run --dry-run "Show plan"     # Preview without executing
-counselors run -t opus,opus,opus "Review this"  # Run the same tool multiple times
+counselors run -t claude-fable-high,claude-fable-high "Review this"  # Run the same tool multiple times
 ```
 
 | Flag | Description |
@@ -322,9 +324,9 @@ Manage predefined groups of tool IDs for easier reuse.
 
 ```bash
 counselors groups list
-counselors groups add smart --tools claude-opus,codex-5.3-xhigh,gemini-3-pro
-counselors groups add fast --tools codex-5.3-high,gemini-3-flash
-counselors groups add opus-swarm --tools claude-opus,claude-opus,claude-opus
+counselors groups add smart --tools claude-fable-high,codex-sol-xhigh,antigravity-flash-high
+counselors groups add fast --tools codex-sol-high,antigravity-pro-high
+counselors groups add fable-swarm --tools claude-fable-high,claude-fable-high,claude-fable-high
 counselors groups remove fast
 ```
 
@@ -353,17 +355,17 @@ Print a `/counselors` slash-command template for use inside Claude Code or other
     "maxParallel": 4
   },
   "tools": {
-    "claude": {
+    "claude-fable-high": {
       "binary": "/usr/local/bin/claude",
       "adapter": "claude",
       "readOnly": { "level": "enforced" },
-      "extraFlags": ["--model", "opus"]
+      "extraFlags": ["--model", "fable", "--effort", "high"]
     }
   },
   "groups": {
-    "smart": ["claude-opus", "codex-5.3-xhigh", "gemini-3-pro"],
-    "fast": ["codex-5.3-high", "gemini-3-flash"],
-    "opus-swarm": ["claude-opus", "claude-opus", "claude-opus"]
+    "smart": ["claude-fable-high", "codex-sol-xhigh", "antigravity-flash-high"],
+    "fast": ["codex-sol-high", "antigravity-pro-high"],
+    "fable-swarm": ["claude-fable-high", "claude-fable-high", "claude-fable-high"]
   }
 }
 ```
@@ -373,7 +375,7 @@ Print a `/counselors` slash-command template for use inside Claude Code or other
 If you want multiple independent responses from the same configured tool, just repeat it in `--tools` (or inside a group). Counselors will automatically fan it out as separate instances.
 
 ```bash
-counselors run -t opus,opus,opus "Review this module for edge cases"
+counselors run -t claude-fable-high,claude-fable-high "Review this module for edge cases"
 ```
 
 ### Project config
