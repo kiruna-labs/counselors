@@ -1,6 +1,14 @@
 import type { Invocation, RunRequest } from '../types.js';
 import { BaseAdapter } from './base.js';
 
+// Google retired standalone Gemini CLI access for individual (free/Pro/Ultra)
+// accounts on 2026-06-18 — attempting to run any preset below now fails with
+// IneligibleTierError even though `tools discover` still finds the `gemini`
+// binary on disk (it was never uninstalled). This adapter is kept only for
+// users with enterprise/workspace Gemini CLI access that's still entitled.
+// For everyone else, AntigravityAdapter (`agy`) is the live Gemini path —
+// none of the models below carry `recommended: true` so `counselors init`
+// doesn't steer new users toward a preset that will fail on first run.
 export class GeminiAdapter extends BaseAdapter {
   id = 'gemini';
   displayName = 'Gemini CLI';
@@ -11,7 +19,6 @@ export class GeminiAdapter extends BaseAdapter {
     {
       id: 'gemini-3-pro',
       name: 'Gemini 3 Pro — latest',
-      recommended: true,
       extraFlags: ['-m', 'gemini-3-pro-preview'],
     },
     {

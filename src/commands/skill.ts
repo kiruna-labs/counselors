@@ -85,9 +85,9 @@ Print the output and have them pick a preset.
 
 	3. Wait for the user's selection before proceeding.
 
-4. **MANDATORY: Confirm the selection before continuing.** After the user picks agents, echo back the exact list you will dispatch to:
+4. **MANDATORY: Confirm the selection before continuing.** After the user picks agents, echo back the exact list you will dispatch to, using the **exact tool IDs printed by \`counselors ls\` in step 1 — never a guessed or remembered ID from a previous session or example**. IDs are config-specific (they encode adapter + model + effort, e.g. \`claude-fable-high\`) and vary between installs; a plausible-looking ID that wasn't in the printed list will fail with "not configured" at dispatch time.
 
-   > Dispatching to: **claude-opus**, **codex-5.3-high**, **gemini-pro**
+   > Dispatching to: **\`<tool-id-1>\`**, **\`<tool-id-2>\`**, **\`<tool-id-3>\`**
 
    Then ask the user to confirm (e.g. "Look good?") before proceeding to Phase 4. This prevents silent tool omissions. If the user corrects the list, update your selection accordingly.
 
@@ -156,10 +156,10 @@ Parse the JSON output and read \`promptFilePath\`, then dispatch with that path:
 counselors run -f <promptFilePath> --tools [comma-separated-tool-ids] --json
 \`\`\`
 
-Examples:
-- \`--tools claude,codex,gemini\`
+Examples (tool IDs below are illustrative placeholders — substitute the real IDs from \`counselors ls\`):
+- \`--tools <tool-id-1>,<tool-id-2>,<tool-id-3>\`
 - \`--group smart\` (uses the configured group)
-- \`--group smart --tools codex\` (group plus explicit tools)
+- \`--group smart --tools <tool-id>\` (group plus an explicit tool)
 
 ### Mode B: \`loop\` + custom prompt file (iterative, no preset)
 
