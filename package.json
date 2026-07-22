@@ -37,6 +37,9 @@
   "engines": {
     "node": ">=20"
   },
+  "overrides": {
+    "esbuild": "^0.28.1"
+  },
   "files": [
     "dist/cli.js",
     "dist/cli.js.map",
