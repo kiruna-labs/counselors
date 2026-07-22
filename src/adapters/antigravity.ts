@@ -22,6 +22,10 @@ export const ANTIGRAVITY_SETTINGS_FILE = join(
 
 const READ_ONLY_RULE = 'read_file(*)';
 const DENIED_STDERR_MARKER = 'jetski: no output produced';
+// Guards the forwarded-stderr error message (see parseResult) against a
+// pathological future agy version emitting something far longer than its
+// current short, single-line denial messages.
+const MAX_FORWARDED_STDERR_LENGTH = 500;
 // Any of these grant more than a read — if the user's own interactive agy
 // use has accumulated one in the shared settings file, headless runs
 // inherit it too, so 'enforced' can no longer be claimed for this tool.
@@ -186,11 +190,21 @@ export class AntigravityAdapter extends BaseAdapter {
       // actively misleading for e.g. a `command(...)` or `unsandboxed(...)`
       // denial (needed for things like `git diff`/`git log` during a
       // review) and sent users chasing the wrong fix.
+      //
+      // ANSI is already stripped from result.stderr upstream by
+      // executor.ts, so only length needs guarding here — agy's real
+      // denial messages run well under this, but nothing guarantees a
+      // future agy version keeps it that short.
+      const rawStderr = result.stderr.trim();
+      const stderrForMessage =
+        rawStderr.length > MAX_FORWARDED_STDERR_LENGTH
+          ? `${rawStderr.slice(0, MAX_FORWARDED_STDERR_LENGTH)}… (truncated)`
+          : rawStderr;
       return {
         ...base,
         status: 'error',
         error: isAntigravityPermissionDenied(result.stderr)
-          ? `agy denied a tool permission in headless mode (settings file: ${ANTIGRAVITY_SETTINGS_FILE}): ${result.stderr.trim()}`
+          ? `agy denied a tool permission in headless mode (settings file: ${ANTIGRAVITY_SETTINGS_FILE}): ${stderrForMessage}`
           : 'agy exited cleanly but produced no output.',
       };
     }
