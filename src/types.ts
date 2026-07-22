@@ -111,8 +111,12 @@ export interface ToolAdapter {
   buildInvocation(req: RunRequest): Invocation;
   parseResult?(result: ExecResult): Partial<ToolReport>;
   /** Return the effective read-only level for a specific tool configuration.
-   *  Adapters override this when certain models have weaker enforcement. */
-  getEffectiveReadOnlyLevel?(toolConfig: ToolConfig): ReadOnlyLevel;
+   *  Adapters override this when certain models have weaker enforcement;
+   *  BaseAdapter's default just returns `readOnly.level`. Not optional —
+   *  every real adapter extends BaseAdapter, so this is always callable;
+   *  callers (e.g. doctor) should call it directly rather than falling back
+   *  to `.readOnly.level`, which skips any dynamic downgrade. */
+  getEffectiveReadOnlyLevel(toolConfig: ToolConfig): ReadOnlyLevel;
 }
 
 // ── Discovery ──

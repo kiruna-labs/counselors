@@ -178,11 +178,19 @@ export class AntigravityAdapter extends BaseAdapter {
       !result.timedOut && result.exitCode === 0 && result.stdout.trim() === '';
 
     if (emptyOnCleanExit) {
+      // agy's own stderr already names the exact permission that was
+      // denied (read_file / command / unsandboxed / write_file / ...) and
+      // the exact allow-rule syntax to grant it — forward it verbatim
+      // instead of guessing. A previous version of this message assumed
+      // every denial was the baseline read_file(*) grant, which was
+      // actively misleading for e.g. a `command(...)` or `unsandboxed(...)`
+      // denial (needed for things like `git diff`/`git log` during a
+      // review) and sent users chasing the wrong fix.
       return {
         ...base,
         status: 'error',
         error: isAntigravityPermissionDenied(result.stderr)
-          ? `agy denied a tool permission in headless mode — re-run "counselors init" (or "tools add") to restore the ${READ_ONLY_RULE} grant in ${ANTIGRAVITY_SETTINGS_FILE}.`
+          ? `agy denied a tool permission in headless mode (settings file: ${ANTIGRAVITY_SETTINGS_FILE}): ${result.stderr.trim()}`
           : 'agy exited cleanly but produced no output.',
       };
     }

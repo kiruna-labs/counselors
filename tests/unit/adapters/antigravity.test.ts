@@ -170,7 +170,7 @@ describe('AntigravityAdapter', () => {
       expect(result.error).toBe('agy exited cleanly but produced no output.');
     });
 
-    it('gives a specific, actionable message when the denial marker is present', () => {
+    it('forwards the exact denied-permission reason from agy stderr, not a hardcoded guess', () => {
       const result = adapter.parseResult({
         exitCode: 0,
         stdout: '',
@@ -181,7 +181,25 @@ describe('AntigravityAdapter', () => {
       });
       expect(result.status).toBe('error');
       expect(result.error).toContain('read_file');
-      expect(result.error).toContain('counselors init');
+      expect(result.error).toContain('settings.json');
+    });
+
+    it('reports a non-read_file denial (e.g. command/unsandboxed) accurately rather than blaming read_file(*)', () => {
+      // Regression test: an earlier version of this message assumed every
+      // denial was the baseline read_file(*) grant, which actively misled
+      // users chasing a "command"/"unsandboxed" denial (e.g. needed for
+      // `git diff`/`git log` during a review) toward the wrong fix.
+      const result = adapter.parseResult({
+        exitCode: 0,
+        stdout: '',
+        stderr:
+          'jetski: no output produced — a tool required the "unsandboxed" permission that headless mode cannot prompt for, so it was auto-denied. Add an allow-rule under permissions.allow in settings.json (e.g. unsandboxed(<target>)).',
+        timedOut: false,
+        durationMs: 500,
+      });
+      expect(result.status).toBe('error');
+      expect(result.error).toContain('unsandboxed');
+      expect(result.error).not.toContain('read_file(*)');
     });
 
     it('leaves timeout status alone even with empty stdout', () => {

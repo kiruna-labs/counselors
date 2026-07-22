@@ -341,7 +341,10 @@ describe('dispatch', () => {
     });
 
     expect(reports[0].status).toBe('error');
-    expect(reports[0].error).toContain('read_file');
+    // The adapter forwards agy's own stderr verbatim rather than a
+    // hardcoded guess — assert the mocked denial text survives, not any
+    // specific permission name.
+    expect(reports[0].error).toContain('permission denied');
   });
 
   it('skips amp-deep under enforced read-only policy', async () => {

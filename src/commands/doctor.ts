@@ -1,7 +1,6 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Command } from 'commander';
-import { isAmpDeepMode } from '../adapters/amp.js';
 import { resolveAdapter } from '../adapters/index.js';
 import {
   AMP_DEEP_SETTINGS_FILE,
@@ -97,15 +96,16 @@ export function registerDoctorCommand(program: Command): void {
           });
         }
 
-        // Read-only capability
+        // Read-only capability — always the adapter's *effective* level, not
+        // its static default. Amp deep mode (Bash, a write-capable tool) and
+        // Antigravity (whose read-only guarantee depends on what's actually
+        // in the user's shared ~/.gemini/antigravity-cli/settings.json, not
+        // just what counselors itself requested) both only downgrade to
+        // bestEffort through this call — reading `adapter.readOnly.level`
+        // directly silently reported "enforced" even when the live grant
+        // was known to be broader.
         const adapter = resolveAdapter(id, toolConfig);
-        let readOnlyLevel = adapter.readOnly.level;
-
-        // Amp deep mode uses Bash (a write-capable tool), so it's bestEffort
-        const adapterName = toolConfig.adapter ?? id;
-        if (adapterName === 'amp' && isAmpDeepMode(toolConfig.extraFlags)) {
-          readOnlyLevel = 'bestEffort';
-        }
+        const readOnlyLevel = adapter.getEffectiveReadOnlyLevel(toolConfig);
 
         checks.push({
           name: `${id}: read-only`,
