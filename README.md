@@ -1,15 +1,15 @@
-# /counselors — make your Claude Fable, GPT-5.6 Sol, and Antigravity subscriptions work together
+# /counselors — prompt Fable and Sol from any coding agent using your subscription
 
-`/counselors` is a skill for Claude Code and Codex. It lets you run reviews in Claude using GPT-5.6 Sol, or in Codex using Fable — or ask all your frontier models at once, and the skill draws conclusions from their responses automatically.
+`/counselors` is a skill for Claude Code and Codex which lets you prompt GPT-5.6 Sol from Claude, or Fable from Codex using your subscriptions.
 
 Originally by [Aaron Francis](https://aaronfrancis.com), creator of [Faster.dev](https://faster.dev) and [Solo](https://soloterm.com) — this repository is a fork of [aarondfrancis/counselors](https://github.com/aarondfrancis/counselors) with a few additions ([details below](#whats-new-in-this-fork), and as PRs on the original repo).
 
 ## How it works
 
-1. You already have a Claude, Codex, and/or Antigravity (aka Gemini) subscription that includes CLI access, with the CLI installed and authenticated.
+1. You already have Claude, Codex, and/or Antigravity (aka Gemini) subscriptions with the CLIs installed and authenticated.
 2. [Install the `/counselors` skill](#agentic-quickstart).
 3. Type `/counselors review the implementation plan for correctness and highlight strengths and weaknesses`.
-   - The skill prompts you for which frontier model(s) you want to fan out to.
+   - The skill prompts you to which frontier model(s) you want to fan out to.
    - It hands those models the context and prompt *through your already-installed CLIs*, without accruing any extra expense, and synthesizes what they agree and disagree on.
 
 Counselors only uses the first-party CLI tools you installed. It does not call provider APIs directly, it does not extract or reuse auth tokens, and it does not do anything "tricky" behind the scenes. It literally runs the official CLI binaries you already installed, the same way you would from your terminal. You are still subject to each provider's terms and rate limits — counselors is just an orchestrator around the CLIs.
