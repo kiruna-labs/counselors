@@ -33,7 +33,7 @@ export const ConfigSchema = z.object({
       maxContextKb: z.number().default(50),
       maxParallel: z.number().default(4),
     })
-    .default({}),
+    .prefault({}),
   tools: z.record(z.string(), ToolConfigSchema).default({}),
   groups: z.record(z.string(), z.array(z.string())).default({}),
 });
